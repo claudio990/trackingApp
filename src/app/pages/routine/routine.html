@@ -1,0 +1,230 @@
+<div class="routine-wrapper">
+
+  <!-- Top Nav -->
+  <header class="top-nav glass-panel">
+    <div class="branding">🦅 Mi Rutina <small>Constancia • Disciplina</small></div>
+    <nav class="nav-links">
+      <button class="nav-btn active">📋 Rutina</button>
+      <button class="nav-btn" (click)="goToDashboard()">📊 Dashboard</button>
+    </nav>
+    <button class="glass-button mex-btn-alt logout-btn" (click)="logout()">Cerrar Sesión</button>
+  </header>
+
+  <div class="main-content">
+
+    <!-- Sidebar -->
+    <aside class="sidebar glass-panel">
+      <h3>Acciones</h3>
+      <p class="subtitle">Arrastra una tarea a su turno</p>
+
+      <div class="task-list"
+           id="taskList"
+           cdkDropList
+           [cdkDropListData]="availableTasks"
+           [cdkDropListConnectedTo]="['morningList','afternoonList','nightList']">
+        <div class="task-item glass-panel" *ngFor="let task of availableTasks" cdkDrag>
+          <span class="icon">{{ task.icon }}</span>
+          <div class="task-details">
+            <span class="name">{{ task.name }}</span>
+            <small>{{ task.description }}</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="glass-button add-global-btn" (click)="openDialog('Morning')">+ Añadir Tarea</button>
+        <button class="glass-button copy-btn" (click)="openCopyDialog()">📋 Copiar Rutina</button>
+      </div>
+    </aside>
+
+    <!-- Routine Board -->
+    <div class="routine-area">
+
+      <!-- Day Tabs -->
+      <div class="days-tabs glass-panel">
+        <button *ngFor="let d of days_es"
+                class="day-btn"
+                [class.active]="d.code === selectedDay"
+                [class.is-today]="d.code === todayCode"
+                (click)="selectDay(d.code)">
+          {{ d.name }}
+          <span class="today-tag" *ngIf="d.code === todayCode">•</span>
+        </button>
+      </div>
+
+      <div class="shifts-board">
+
+        <!-- MAÑANA -->
+        <div class="shift-column glass-panel border-mañana">
+          <div class="shift-header">
+            <div class="shift-title-row">
+              <h3>🌅 Mañana</h3>
+              <button class="add-shift-btn" (click)="openDialog('Morning')">+</button>
+            </div>
+            <span>Amanecer y Enfoque</span>
+          </div>
+          <div class="shift-list" id="morningList" cdkDropList
+               [cdkDropListData]="morningList"
+               [cdkDropListConnectedTo]="['afternoonList','nightList']"
+               (cdkDropListDropped)="drop($event,'Morning')">
+            <div class="routine-item" *ngFor="let r of morningList; trackBy: trackById" cdkDrag
+                 [class.completed]="r.is_completed" [class.temp]="r._temp">
+              <button class="check-btn" (click)="toggleCheck(r)">
+                <span *ngIf="r.is_completed">✓</span>
+              </button>
+              <span class="icon">{{ r.task?.icon }}</span>
+              <div class="routine-details">
+                <span class="name">{{ r.task?.name }}</span>
+                <input type="time" class="time-picker" [(ngModel)]="r.time" (change)="updateTime(r)">
+              </div>
+              <button class="delete-btn" (click)="deleteRoutine(r.id,'Morning')">✕</button>
+            </div>
+            <div class="empty-state" *ngIf="morningList.length === 0">
+              <span>Sin tareas matutinas</span>
+              <button class="empty-add-btn" (click)="openDialog('Morning')">+ Añadir</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TARDE -->
+        <div class="shift-column glass-panel border-tarde">
+          <div class="shift-header">
+            <div class="shift-title-row">
+              <h3>☀️ Tarde</h3>
+              <button class="add-shift-btn" (click)="openDialog('Afternoon')">+</button>
+            </div>
+            <span>Ejecución y Constancia</span>
+          </div>
+          <div class="shift-list" id="afternoonList" cdkDropList
+               [cdkDropListData]="afternoonList"
+               [cdkDropListConnectedTo]="['morningList','nightList']"
+               (cdkDropListDropped)="drop($event,'Afternoon')">
+            <div class="routine-item" *ngFor="let r of afternoonList; trackBy: trackById" cdkDrag
+                 [class.completed]="r.is_completed" [class.temp]="r._temp">
+              <button class="check-btn" (click)="toggleCheck(r)">
+                <span *ngIf="r.is_completed">✓</span>
+              </button>
+              <span class="icon">{{ r.task?.icon }}</span>
+              <div class="routine-details">
+                <span class="name">{{ r.task?.name }}</span>
+                <input type="time" class="time-picker" [(ngModel)]="r.time" (change)="updateTime(r)">
+              </div>
+              <button class="delete-btn" (click)="deleteRoutine(r.id,'Afternoon')">✕</button>
+            </div>
+            <div class="empty-state" *ngIf="afternoonList.length === 0">
+              <span>Sin tareas por la tarde</span>
+              <button class="empty-add-btn" (click)="openDialog('Afternoon')">+ Añadir</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOCHE -->
+        <div class="shift-column glass-panel border-noche">
+          <div class="shift-header">
+            <div class="shift-title-row">
+              <h3>🌙 Noche</h3>
+              <button class="add-shift-btn" (click)="openDialog('Night')">+</button>
+            </div>
+            <span>Recuperación y Cierre</span>
+          </div>
+          <div class="shift-list" id="nightList" cdkDropList
+               [cdkDropListData]="nightList"
+               [cdkDropListConnectedTo]="['morningList','afternoonList']"
+               (cdkDropListDropped)="drop($event,'Night')">
+            <div class="routine-item" *ngFor="let r of nightList; trackBy: trackById" cdkDrag
+                 [class.completed]="r.is_completed" [class.temp]="r._temp">
+              <button class="check-btn" (click)="toggleCheck(r)">
+                <span *ngIf="r.is_completed">✓</span>
+              </button>
+              <span class="icon">{{ r.task?.icon }}</span>
+              <div class="routine-details">
+                <span class="name">{{ r.task?.name }}</span>
+                <input type="time" class="time-picker" [(ngModel)]="r.time" (change)="updateTime(r)">
+              </div>
+              <button class="delete-btn" (click)="deleteRoutine(r.id,'Night')">✕</button>
+            </div>
+            <div class="empty-state" *ngIf="nightList.length === 0">
+              <span>Sin tareas nocturnas</span>
+              <button class="empty-add-btn" (click)="openDialog('Night')">+ Añadir</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ADD TASK DIALOG ─────────────────────────────────────────────────── -->
+  <div class="dialog-overlay" *ngIf="showDialog" (click)="closeDialog()">
+    <div class="dialog-panel glass-panel" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h3>Añadir tarea <span class="shift-badge">{{ shiftLabel }}</span></h3>
+        <button class="close-btn" (click)="closeDialog()">✕</button>
+      </div>
+      <div class="dialog-search">
+        <input type="text" class="glass-input" [(ngModel)]="dialogSearch" placeholder="Buscar tarea...">
+      </div>
+      <div class="dialog-task-list">
+        <div class="dialog-task-item" *ngFor="let task of filteredTasks" (click)="selectTaskFromDialog(task)">
+          <span class="icon">{{ task.icon }}</span>
+          <div><span class="name">{{ task.name }}</span><small>{{ task.description }}</small></div>
+        </div>
+        <div class="no-results" *ngIf="filteredTasks.length === 0 && !showNewTaskForm">Sin resultados</div>
+      </div>
+      <button class="glass-button new-task-toggle-btn" (click)="showNewTaskForm = !showNewTaskForm">
+        {{ showNewTaskForm ? '← Ver lista' : '+ Crear nueva tarea' }}
+      </button>
+      <div class="new-task-form" *ngIf="showNewTaskForm">
+        <div class="form-row">
+          <input type="text" class="glass-input emoji-input" [(ngModel)]="newTaskIcon" placeholder="Emoji" maxlength="4">
+          <input type="text" class="glass-input task-name-input" [(ngModel)]="newTaskName" placeholder="Nombre de la tarea">
+        </div>
+        <button class="glass-button full-width mex-btn" [disabled]="!newTaskName.trim()" (click)="createAndAddTask()">
+          Crear y Añadir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── COPY DIALOG ──────────────────────────────────────────────────────── -->
+  <div class="dialog-overlay" *ngIf="showCopyDialog" (click)="closeCopyDialog()">
+    <div class="dialog-panel glass-panel" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h3>📋 Copiar Rutina</h3>
+        <button class="close-btn" (click)="closeCopyDialog()">✕</button>
+      </div>
+
+      <div class="copy-form">
+        <div class="copy-section">
+          <label class="copy-label">ORIGEN — Día actual: <strong>{{ selectedDay }}</strong></label>
+          <select class="glass-input" [(ngModel)]="copyFromShift">
+            <option *ngFor="let s of shiftsOptions" [value]="s.value">{{ s.label }}</option>
+          </select>
+        </div>
+
+        <div class="copy-arrow">→</div>
+
+        <div class="copy-section">
+          <label class="copy-label">DESTINO — Días</label>
+          <div class="checkbox-group" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:6px; margin-bottom:10px;">
+            <label *ngFor="let d of days_es" class="checkbox-label" style="display:flex; align-items:center; gap:4px; font-size:13px;">
+              <input type="checkbox" [(ngModel)]="copyToDays[d.code]" style="accent-color: var(--mex-turquesa);">
+              {{ d.name }}
+            </label>
+          </div>
+          <label class="copy-label" style="margin-top:10px">Turno destino</label>
+          <select class="glass-input" [(ngModel)]="copyToShift">
+            <option *ngFor="let s of shiftsOptions" [value]="s.value">{{ s.label }}</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="copy-msg" *ngIf="copyMsg">{{ copyMsg }}</p>
+
+      <button class="glass-button full-width mex-btn" style="margin-top:20px" (click)="executeCopy()" [disabled]="isCopying">
+        {{ isCopying ? 'Copiando...' : 'Copiar Tareas' }}
+      </button>
+    </div>
+  </div>
+
+</div>

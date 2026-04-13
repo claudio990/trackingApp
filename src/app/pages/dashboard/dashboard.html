@@ -1,0 +1,130 @@
+<div class="dashboard-wrapper mex-bg">
+  
+  <header class="top-nav glass-panel">
+    <div class="branding">🦅 Mi Rutina Ideal <small>Constancia • Disciplina</small></div>
+    <div class="nav-actions">
+      <button class="glass-button secondary mex-btn-alt" (click)="logout()">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <div class="main-content">
+    
+    <!-- Sidebar: Tareas Disponibles -->
+    <aside class="sidebar glass-panel">
+      <h3>Acciones</h3>
+      <p class="subtitle">Arrastra a tu horario</p>
+      
+      <div class="task-list" 
+           id="taskList" 
+           cdkDropList 
+           [cdkDropListData]="availableTasks" 
+           [cdkDropListConnectedTo]="['morningList', 'afternoonList', 'nightList']">
+        <div class="task-item glass-panel mex-item" *ngFor="let task of availableTasks" cdkDrag>
+          <span class="icon">{{ task.icon }}</span>
+          <div class="task-details">
+            <span class="name">{{ task.name }}</span>
+            <small>{{ task.description }}</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Área de Rutina -->
+    <div class="routine-area">
+      
+      <!-- Pestañas de Días -->
+      <div class="days-tabs glass-panel">
+        <button *ngFor="let d of days_es" 
+                class="day-btn" 
+                [class.active]="d.code === selectedDay"
+                (click)="selectDay(d.code)">
+          {{ d.name }}
+        </button>
+      </div>
+
+      <div class="shifts-board">
+        <!-- Mañana -->
+        <div class="shift-column glass-panel border-mañana">
+          <div class="shift-header">
+            <h3>🌅 Mañana</h3>
+            <span>Amanecer y Enfoque</span>
+          </div>
+          <div class="shift-list" 
+               id="morningList"
+               cdkDropList 
+               [cdkDropListData]="morningList" 
+               [cdkDropListConnectedTo]="['afternoonList', 'nightList']"
+               (cdkDropListDropped)="drop($event, 'Morning')">
+            <div class="routine-item glass-panel" *ngFor="let routine of morningList" cdkDrag [class.completed]="routine.is_completed">
+              <button class="check-btn" (click)="toggleCheck(routine)">
+                <span *ngIf="routine.is_completed">✓</span>
+              </button>
+              <span class="icon">{{ routine.task?.icon }}</span>
+              <div class="routine-details">
+                <span class="name">{{ routine.task?.name }}</span>
+                <input type="text" class="time-input" [(ngModel)]="routine.time" placeholder="Hora (ej. 6:00)" (blur)="saveOrder(morningList, 'Morning')">
+              </div>
+              <button class="delete-btn" (click)="deleteRoutine(routine.id)">✕</button>
+            </div>
+            <div class="empty-state" *ngIf="morningList.length === 0">Sin tareas matutinas</div>
+          </div>
+        </div>
+
+        <!-- Tarde -->
+        <div class="shift-column glass-panel border-tarde">
+          <div class="shift-header">
+            <h3>☀️ Tarde</h3>
+            <span>Ejecución y Constancia</span>
+          </div>
+          <div class="shift-list" 
+               id="afternoonList"
+               cdkDropList 
+               [cdkDropListData]="afternoonList" 
+               [cdkDropListConnectedTo]="['morningList', 'nightList']"
+               (cdkDropListDropped)="drop($event, 'Afternoon')">
+            <div class="routine-item glass-panel" *ngFor="let routine of afternoonList" cdkDrag [class.completed]="routine.is_completed">
+              <button class="check-btn" (click)="toggleCheck(routine)">
+                <span *ngIf="routine.is_completed">✓</span>
+              </button>
+              <span class="icon">{{ routine.task?.icon }}</span>
+              <div class="routine-details">
+                <span class="name">{{ routine.task?.name }}</span>
+                <input type="text" class="time-input" [(ngModel)]="routine.time" placeholder="Hora (ej. 14:00)" (blur)="saveOrder(afternoonList, 'Afternoon')">
+              </div>
+              <button class="delete-btn" (click)="deleteRoutine(routine.id)">✕</button>
+            </div>
+            <div class="empty-state" *ngIf="afternoonList.length === 0">Sin tareas por la tarde</div>
+          </div>
+        </div>
+
+        <!-- Noche -->
+        <div class="shift-column glass-panel border-noche">
+          <div class="shift-header">
+            <h3>🌙 Noche</h3>
+            <span>Recuperación y Cierre</span>
+          </div>
+          <div class="shift-list" 
+               id="nightList"
+               cdkDropList 
+               [cdkDropListData]="nightList" 
+               [cdkDropListConnectedTo]="['morningList', 'afternoonList']"
+               (cdkDropListDropped)="drop($event, 'Night')">
+            <div class="routine-item glass-panel" *ngFor="let routine of nightList" cdkDrag [class.completed]="routine.is_completed">
+              <button class="check-btn" (click)="toggleCheck(routine)">
+                <span *ngIf="routine.is_completed">✓</span>
+              </button>
+              <span class="icon">{{ routine.task?.icon }}</span>
+              <div class="routine-details">
+                <span class="name">{{ routine.task?.name }}</span>
+                <input type="text" class="time-input" [(ngModel)]="routine.time" placeholder="Hora (ej. 21:30)" (blur)="saveOrder(nightList, 'Night')">
+              </div>
+              <button class="delete-btn" (click)="deleteRoutine(routine.id)">✕</button>
+            </div>
+            <div class="empty-state" *ngIf="nightList.length === 0">Sin tareas nocturnas</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

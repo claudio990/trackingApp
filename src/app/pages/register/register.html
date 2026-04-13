@@ -1,0 +1,44 @@
+<div class="auth-container mex-pattern">
+  <div class="glass-panel auth-card">
+    <div class="auth-header">
+      <div class="mex-icon">🌵</div>
+      <h2>Crear Cuenta</h2>
+      <p>Empieza tu ruta hacia la excelencia.</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Nombre Completo</label>
+        <input type="text" class="glass-input" formControlName="name" placeholder="Tu nombre">
+      </div>
+      <div class="form-group">
+        <label>Correo Electrónico</label>
+        <input type="email" class="glass-input" formControlName="email" placeholder="ejemplo@correo.com">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <div class="password-wrapper">
+          <input [type]="showPassword ? 'text' : 'password'" 
+                 class="glass-input" 
+                 formControlName="password" 
+                 placeholder="Mínimo 6 caracteres">
+          <button type="button" class="view-btn" (click)="togglePassword()">
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
+      </div>
+      
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+
+      <button type="submit" class="glass-button full-width mex-btn" [disabled]="registerForm.invalid">
+        Registrarse
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>¿Ya tienes cuenta? <a (click)="goToLogin()" class="text-link">Inicia sesión aquí</a></p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,192 @@
+<div class="dash-wrapper">
+
+  <!-- Top Nav -->
+  <header class="top-nav glass-panel">
+    <div class="branding">🦅 Dashboard <small>Métricas y Progreso</small></div>
+    <nav class="nav-links">
+      <button class="nav-btn" (click)="goToRoutine()">📋 Rutina</button>
+      <button class="nav-btn active">📊 Dashboard</button>
+    </nav>
+    <button class="glass-button mex-btn-alt" (click)="logout()">Cerrar Sesión</button>
+  </header>
+
+  <!-- Date Filter Bar -->
+  <div class="filter-bar glass-panel">
+    <span class="filter-label">Período</span>
+    <input type="date" class="glass-input date-input" [(ngModel)]="fromDate">
+    <span class="filter-sep">→</span>
+    <input type="date" class="glass-input date-input" [(ngModel)]="toDate">
+    <button class="glass-button mex-btn filter-btn" (click)="loadMetrics()">Filtrar</button>
+    <span class="filter-label" style="color: var(--text-secondary); font-size:13px">
+      {{ metrics?.from }} / {{ metrics?.to }}
+    </span>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner">🌀</div>
+  </div>
+
+  <!-- No data -->
+  <div class="no-data glass-panel" *ngIf="!loading && metrics && metrics.summary.total === 0">
+    <span>😕</span>
+    <h3>Sin registros en este período</h3>
+    <p>Empieza a marcar tus tareas en la rutina para ver aquí tus estadísticas.</p>
+    <button class="glass-button mex-btn" (click)="goToRoutine()">📋 Ir a Mi Rutina</button>
+  </div>
+
+  <!-- Metrics Grid -->
+  <div class="metrics-grid" *ngIf="!loading && metrics && metrics.summary.total > 0">
+
+    <!-- ─── Summary Cards ─── -->
+    <div class="cards-row">
+      <div class="metric-card glass-panel grade-card" [style.border-color]="grade.color">
+        <div class="grade-circle" [style.background]="grade.color + '30'" [style.border-color]="grade.color">
+          <span class="grade-pct">{{ metrics.summary.pct }}%</span>
+        </div>
+        <div>
+          <div class="card-title">Cumplimiento General</div>
+          <div class="card-grade" [style.color]="grade.color">{{ grade.label }}</div>
+          <div class="card-sub">{{ metrics.summary.completed }} / {{ metrics.summary.total }} tareas</div>
+        </div>
+      </div>
+
+      <div class="metric-card glass-panel">
+        <span class="card-icon">📅</span>
+        <div>
+          <div class="card-title">Mejor Día de la Semana</div>
+          <div class="card-value">{{ metrics.best_day ?? '—' }}</div>
+          <div class="card-sub">Basado en % de cumplimiento</div>
+        </div>
+      </div>
+
+      <div class="metric-card glass-panel" *ngFor="let s of metrics.shifts">
+        <span class="card-icon">{{ shiftIcon(s.shift) }}</span>
+        <div>
+          <div class="card-title">{{ shiftName(s.shift) }}</div>
+          <div class="card-value">{{ s.pct }}%</div>
+          <div class="card-sub">{{ s.completed }}/{{ s.total }} completadas</div>
+          <div class="mini-bar-bg"><div class="mini-bar" [style.width]="barWidth(s.pct)" [style.background]="shiftIcon(s.shift) === '🌅' ? 'var(--mex-cempasuchil)' : shiftIcon(s.shift) === '☀️' ? 'var(--mex-jade)' : 'var(--mex-turquesa)'"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Daily Chart ─── -->
+    <div class="chart-section glass-panel">
+      <h3>📈 Cumplimiento Diario</h3>
+      <div class="daily-chart">
+        <div class="bar-group" *ngFor="let day of metrics.daily">
+          <div class="bar-container">
+            <div class="bar-fill" [style.height]="barWidth(day.pct)"
+                 [class.bar-high]="day.pct >= 70"
+                 [class.bar-mid]="day.pct >= 40 && day.pct < 70"
+                 [class.bar-low]="day.pct < 40"
+                 [title]="day.date + ': ' + day.pct + '%'" >
+            </div>
+          </div>
+          <div class="bar-label">
+            <span class="bar-pct">{{ day.pct }}%</span>
+            <span class="bar-date">{{ day.date | slice:5 }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-dot high"></span> ≥70%
+        <span class="legend-dot mid"></span> 40-69%
+        <span class="legend-dot low"></span> &lt;40%
+      </div>
+    </div>
+
+    <!-- ─── Top Days ─── -->
+    <div class="top-days glass-panel">
+      <h3>🏅 Mejores Días del Período</h3>
+      <div class="top-day-item" *ngFor="let d of topDays; let i = index">
+        <span class="rank">{{ i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i+1) }}</span>
+        <span class="day-date">{{ d.date }}</span>
+        <div class="day-bar-bg">
+          <div class="day-bar" [style.width]="barWidth(d.pct)"></div>
+        </div>
+        <span class="day-pct">{{ d.pct }}%</span>
+        <small class="day-count">{{ d.completed }}/{{ d.total }}</small>
+      </div>
+    </div>
+
+  </div><!-- metrics-grid -->
+
+  <!-- ─── Task Stats ─── -->
+  <div class="metrics-grid" *ngIf="!loading && metrics && metrics.summary.total > 0" style="padding-top: 0;">
+    <div class="cards-row">
+      <!-- Mejores Tareas -->
+      <div class="metric-card glass-panel" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+        <h3 style="font-size: 14px; margin-bottom: 5px;">🔥 Tareas Más Constantes</h3>
+        <div class="task-stat-item" *ngFor="let t of bestTasks" style="display:flex; align-items:center; gap:10px; width:100%">
+          <span class="icon" style="font-size:24px;">{{ t.icon }}</span>
+          <div class="info" style="flex:1">
+            <div class="name" style="font-size:13px; font-weight:700; display:flex; justify-content:space-between;">
+              {{ t.name }} <span class="pct" style="color:var(--mex-jade)">{{ t.pct }}%</span>
+            </div>
+            <div class="sub" style="font-size:11px; color:var(--text-secondary)">{{ t.completed }} / {{ t.total }} completadas</div>
+          </div>
+        </div>
+        <div *ngIf="bestTasks.length === 0" class="card-sub">Sin datos aún</div>
+      </div>
+
+      <!-- Peores Tareas -->
+      <div class="metric-card glass-panel" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+        <h3 style="font-size: 14px; margin-bottom: 5px;">⚠️ Áreas de Oportunidad</h3>
+        <div class="task-stat-item" *ngFor="let t of worstTasks" style="display:flex; align-items:center; gap:10px; width:100%">
+          <span class="icon" style="font-size:24px;">{{ t.icon }}</span>
+          <div class="info" style="flex:1">
+            <div class="name" style="font-size:13px; font-weight:700; display:flex; justify-content:space-between;">
+              {{ t.name }} <span class="pct" style="color:var(--mex-rojo)">{{ t.pct }}%</span>
+            </div>
+            <div class="sub" style="font-size:11px; color:var(--text-secondary)">{{ t.completed }} / {{ t.total }} completadas</div>
+          </div>
+        </div>
+        <div *ngIf="worstTasks.length === 0" class="card-sub">Sin datos aún</div>
+      </div>
+    </div>
+
+    <!-- ─── Comparativa de Tareas ─── -->
+    <div class="tasks-table-section glass-panel" style="margin-top: 16px; padding: 24px; border-radius: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3>📊 Comparativa de Todas las Tareas</h3>
+        <input type="text" class="glass-input" [(ngModel)]="taskSearch" placeholder="🔍 Buscar tarea..." style="max-width: 250px; padding: 8px 12px;">
+      </div>
+      
+      <div class="table-container" style="overflow-x: auto; max-height: 400px;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+          <thead style="position: sticky; top: 0; background: rgba(30, 41, 59, 1); z-index: 1;">
+            <tr>
+              <th style="padding: 12px; border-bottom: 1px solid var(--glass-border); font-size: 11px; text-transform: uppercase;">Tarea</th>
+              <th style="padding: 12px; border-bottom: 1px solid var(--glass-border); font-size: 11px; text-transform: uppercase;">Completadas</th>
+              <th style="padding: 12px; border-bottom: 1px solid var(--glass-border); font-size: 11px; text-transform: uppercase;">Asignadas</th>
+              <th style="padding: 12px; border-bottom: 1px solid var(--glass-border); font-size: 11px; text-transform: uppercase;">Tasa de Éxito</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of filteredTasks" style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.3s; cursor: default;">
+              <td style="padding: 12px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">{{ t.icon }}</span> <span style="font-weight: 600;">{{ t.name }}</span>
+              </td>
+              <td style="padding: 12px; font-weight: 700;">{{ t.completed }}</td>
+              <td style="padding: 12px; color: var(--text-secondary);">{{ t.total }}</td>
+              <td style="padding: 12px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div style="flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;">
+                    <div [style.width]="barWidth(t.pct)" [style.background]="t.pct >= 70 ? 'var(--mex-jade)' : t.pct >= 40 ? 'var(--mex-cempasuchil)' : 'var(--mex-rojo)'" style="height:100%; border-radius:3px;"></div>
+                  </div>
+                  <span style="font-weight: 700; width:35px; text-align:right;">{{ t.pct }}%</span>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredTasks.length === 0">
+              <td colspan="4" style="padding: 20px; text-align: center; color: var(--text-secondary);">No se encontraron tareas</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>

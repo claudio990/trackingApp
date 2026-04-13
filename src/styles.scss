@@ -1,1 +1,183 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --bg-color: #0f1218;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --glass-bg: rgba(30, 41, 59, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  
+  /* Mexican Identity Palette */
+  --mex-cempasuchil: #FF9800; /* Cempasúchil Orange */
+  --mex-turquesa: #00ACC1;    /* Deep Turquoise */
+  --mex-tierra: #8D6E63;      /* Terracotta/Clay */
+  --mex-jade: #43A047;        /* Jade Green */
+  --mex-rojo: #E53935;        /* Tradition Red */
+  
+  --accent-color: var(--mex-turquesa);
+  --accent-hover: #00838F;
+  --card-radius: 16px;
+  --surface-radius: 20px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-color);
+  /* Mexican-inspired background with subtle patterns */
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(255, 152, 0, 0.1) 0px, transparent 40%),
+    radial-gradient(at 100% 0%, rgba(0, 172, 193, 0.1) 0px, transparent 40%),
+    radial-gradient(at 50% 100%, rgba(67, 160, 71, 0.05) 0px, transparent 40%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--mex-cempasuchil);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--surface-radius);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+.glass-button {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    background: var(--mex-cempasuchil);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 152, 0, 0.4);
+  }
+}
+
+.mex-btn {
+  background: linear-gradient(135deg, var(--mex-rojo), var(--mex-cempasuchil));
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+.mex-btn-alt {
+  background: transparent;
+  border: 1px solid var(--mex-turquesa);
+  color: var(--mex-turquesa);
+  &:hover {
+    background: rgba(0, 172, 193, 0.1);
+    border-color: var(--mex-turquesa);
+  }
+}
+
+.glass-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: white;
+  font-family: inherit;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--mex-turquesa);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 15px rgba(0, 172, 193, 0.2);
+  }
+}
+
+select.glass-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 42px;
+  cursor: pointer;
+  color-scheme: dark;
+
+  option {
+    background: #1e293b;
+    color: white;
+  }
+}
+
+/* Password View Helper */
+.password-wrapper {
+  position: relative;
+  .view-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    &:hover { opacity: 1; }
+  }
+}
+
+/* Custom Mexican Identity Elements */
+.mex-icon {
+  font-size: 50px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 10px rgba(255, 152, 0, 0.3));
+}
+
+.auth-header p {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--mex-turquesa);
+  text-transform: uppercase;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--mex-tierra);
+  border-radius: 10px;
+}
