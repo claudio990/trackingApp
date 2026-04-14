@@ -25,6 +25,7 @@ export class Routine implements OnInit {
   ];
   selectedDay = '';
   todayCode = '';
+  viewDate = ''; // The actual date we are viewing / checking
 
   availableTasks: any[] = [];
   allRoutines: any = {};
@@ -77,10 +78,13 @@ export class Routine implements OnInit {
 
   ngOnInit() {
     const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    this.todayCode = dayNames[new Date().getDay()];
+    const now = new Date();
+    this.todayCode = dayNames[now.getDay()];
     this.selectedDay = this.todayCode;
+    this.viewDate = now.toISOString().split('T')[0];
+    
     this.loadTasks();
-    this.loadRoutines();
+    this.loadRoutines(this.viewDate);
   }
 
   // ── Data loading ─────────────────────────────────────────────────────────
@@ -88,16 +92,32 @@ export class Routine implements OnInit {
     this.tracking.getTasks().subscribe(res => { this.availableTasks = res; });
   }
 
-  loadRoutines() {
-    this.tracking.getRoutines().subscribe(res => {
+  loadRoutines(date?: string) {
+    this.tracking.getRoutines(date).subscribe(res => {
       this.allRoutines = res;
       this.updateDayView();
     });
   }
 
-  selectDay(day: string) {
-    this.selectedDay = day;
-    this.updateDayView();
+  selectDay(dayCode: string) {
+    this.selectedDay = dayCode;
+    // Calculate the date for this day in the current week
+    this.viewDate = this.getWeekDate(dayCode);
+    this.loadRoutines(this.viewDate);
+  }
+
+  getWeekDate(dayCode: string): string {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const targetIdx = days.indexOf(dayCode);
+    const now = new Date();
+    const todayIdx = now.getDay();
+    
+    // Simple logic: get the date for the target day within the current rolling week
+    const diff = targetIdx - todayIdx;
+    const target = new Date(now);
+    target.setDate(now.getDate() + diff);
+    
+    return target.toISOString().split('T')[0];
   }
 
   updateDayView() {
@@ -157,8 +177,8 @@ export class Routine implements OnInit {
   toggleCheck(routine: any) {
     routine.is_completed = !routine.is_completed;   // optimistic
     this.cdr.detectChanges(); // Force view update
-    const today = new Date().toISOString().split('T')[0];
-    this.tracking.toggleCheck(routine.id, today).subscribe({
+    
+    this.tracking.toggleCheck(routine.id, this.viewDate).subscribe({
       next: res => { routine.is_completed = res.is_completed; this.cdr.detectChanges(); },
       error: () => { routine.is_completed = !routine.is_completed; this.cdr.detectChanges(); }  // rollback
     });

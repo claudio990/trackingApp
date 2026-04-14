@@ -479,3 +479,80 @@
   font-size: 15px;
   margin-top: 10px;
 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .top-nav {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    text-align: center;
+    .nav-links { width: 100%; justify-content: center; }
+    .logout-btn { width: 100%; }
+  }
+
+  .main-content {
+    flex-direction: column;
+    overflow-y: auto;
+    height: auto;
+    padding-bottom: 80px;
+  }
+
+  .sidebar {
+    width: 100%;
+    order: 2; /* Put it below the board */
+    border-left: none;
+    border-top: 4px solid var(--mex-jade);
+    
+    .task-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      flex: none;
+    }
+    
+    .task-item {
+      min-width: 200px;
+      margin-bottom: 0;
+      &:hover { transform: translateY(-4px); }
+    }
+  }
+
+  .routine-area {
+    flex: none;
+  }
+
+  .shifts-board {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .shift-column {
+    flex: none;
+    &.border-mañana, &.border-tarde, &.border-noche {
+      margin-bottom: 16px;
+    }
+  }
+
+  .days-tabs {
+    overflow-x: auto;
+    padding-bottom: 10px;
+    .day-btn {
+      min-width: 65px;
+      flex: none;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .top-nav .branding { font-size: 18px; }
+  .shift-column { padding: 15px; }
+  .routine-item {
+    padding: 10px;
+    .icon { font-size: 20px; margin-right: 8px; }
+    .name { font-size: 13px; }
+  }
+}

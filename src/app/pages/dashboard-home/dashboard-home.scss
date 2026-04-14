@@ -219,3 +219,48 @@
     .day-count { font-size: 11px; color: var(--text-secondary); width: 50px; flex-shrink: 0; }
   }
 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 800px) {
+  .top-nav {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    margin: 10px;
+    text-align: center;
+    .nav-links { width: 100%; justify-content: center; }
+  }
+
+  .filter-bar {
+    margin: 10px;
+    padding: 15px;
+    justify-content: center;
+    .date-input { width: 130px; }
+  }
+
+  .metrics-grid { padding: 10px; }
+
+  .metric-card {
+    min-width: 100%; /* Stack cards on mobile */
+  }
+
+  .chart-section {
+    padding: 15px;
+    h3 { font-size: 16px; }
+  }
+
+  .top-days {
+    padding: 15px;
+    .day-date { width: 70px; font-size: 12px; }
+  }
+
+  /* Table responsiveness */
+  .tasks-table-section {
+    padding: 15px !important;
+    h3 { font-size: 16px; }
+    .glass-input { max-width: 100% !important; margin-top: 10px; }
+    thead th { font-size: 10px !important; padding: 8px !important; }
+    tbody td { padding: 8px !important; font-size: 12px !important; }
+  }
+}
+

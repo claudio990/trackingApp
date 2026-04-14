@@ -15,8 +15,9 @@ export class TrackingService {
     return this.http.get<any[]>(`${this.apiUrl}/tasks`, this.auth.headers);
   }
 
-  getRoutines() {
-    return this.http.get<any>(`${this.apiUrl}/routines`, this.auth.headers);
+  getRoutines(date?: string) {
+    const url = date ? `${this.apiUrl}/routines?date=${date}` : `${this.apiUrl}/routines`;
+    return this.http.get<any>(url, this.auth.headers);
   }
 
   addRoutine(data: any) {
