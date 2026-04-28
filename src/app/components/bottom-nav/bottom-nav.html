@@ -1,0 +1,14 @@
+<nav class="bottom-nav">
+  <button class="nav-item" [class.active]="isRoutine" (click)="goToRoutine()">
+    <span class="nav-icon">📋</span>
+    <span class="nav-label">Rutina</span>
+  </button>
+  <button class="nav-item" [class.active]="isDashboard" (click)="goToDashboard()">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">Métricas</span>
+  </button>
+  <button class="nav-item nav-item--logout" (click)="logout()">
+    <span class="nav-icon">🚪</span>
+    <span class="nav-label">Salir</span>
+  </button>
+</nav>

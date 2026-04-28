@@ -5,11 +5,13 @@ import { TrackingService } from '../../services/tracking';
 import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { BottomNav } from '../../components/bottom-nav/bottom-nav';
+import { PushNotificationService } from '../../services/push-notifications';
 
 @Component({
   selector: 'app-routine',
   standalone: true,
-  imports: [CommonModule, DragDropModule, FormsModule],
+  imports: [CommonModule, DragDropModule, FormsModule, BottomNav],
   templateUrl: './routine.html',
   styleUrl: './routine.scss'
 })
@@ -69,11 +71,30 @@ export class Routine implements OnInit {
     return m[this.dialogShift] || '';
   }
 
+  // ── Push Notifications ───────────────────────────────────────────────────
+  get notifIcon() {
+    if (!('Notification' in window)) return '🔕';
+    return Notification.permission === 'granted' ? '🔔' : '🔕';
+  }
+
+  get notifBtnTitle() {
+    if (!('Notification' in window)) return 'Notificaciones no soportadas';
+    return Notification.permission === 'granted'
+      ? 'Notificaciones activas'
+      : 'Activar notificaciones de recordatorio';
+  }
+
+  async toggleNotifications() {
+    await this.pushNotif.requestPermission();
+    this.cdr.detectChanges();
+  }
+
   constructor(
     private tracking: TrackingService,
     private auth: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private pushNotif: PushNotificationService
   ) {}
 
   ngOnInit() {

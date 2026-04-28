@@ -3,11 +3,11 @@
   <!-- Top Nav -->
   <header class="top-nav glass-panel">
     <div class="branding">🦅 Dashboard <small>Métricas y Progreso</small></div>
-    <nav class="nav-links">
+    <nav class="nav-links desktop-only">
       <button class="nav-btn" (click)="goToRoutine()">📋 Rutina</button>
       <button class="nav-btn active">📊 Dashboard</button>
     </nav>
-    <button class="glass-button mex-btn-alt" (click)="logout()">Cerrar Sesión</button>
+    <button class="glass-button mex-btn-alt desktop-only" (click)="logout()">Cerrar Sesión</button>
   </header>
 
   <!-- Date Filter Bar -->
@@ -111,7 +111,7 @@
       </div>
     </div>
 
-  </div><!-- metrics-grid -->
+  </div><!-- metrics-grid end -->
 
   <!-- ─── Task Stats ─── -->
   <div class="metrics-grid" *ngIf="!loading && metrics && metrics.summary.total > 0" style="padding-top: 0;">
@@ -188,5 +188,7 @@
       </div>
     </div>
   </div>
+
+  <app-bottom-nav></app-bottom-nav>
 
 </div>

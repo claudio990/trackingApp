@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { TrackingService } from '../../services/tracking';
+import { BottomNav } from '../../components/bottom-nav/bottom-nav';
 
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BottomNav],
   templateUrl: './dashboard-home.html',
   styleUrl: './dashboard-home.scss'
 })

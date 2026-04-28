@@ -3,11 +3,16 @@
   <!-- Top Nav -->
   <header class="top-nav glass-panel">
     <div class="branding">🦅 Mi Rutina <small>Constancia • Disciplina</small></div>
-    <nav class="nav-links">
+    <nav class="nav-links desktop-only">
       <button class="nav-btn active">📋 Rutina</button>
       <button class="nav-btn" (click)="goToDashboard()">📊 Dashboard</button>
     </nav>
-    <button class="glass-button mex-btn-alt logout-btn" (click)="logout()">Cerrar Sesión</button>
+    <div class="top-nav-actions">
+      <button class="notif-btn" (click)="toggleNotifications()" [title]="notifBtnTitle">
+        {{ notifIcon }}
+      </button>
+      <button class="glass-button mex-btn-alt logout-btn desktop-only" (click)="logout()">Cerrar Sesión</button>
+    </div>
   </header>
 
   <div class="main-content">
@@ -230,5 +235,7 @@
       </button>
     </div>
   </div>
+
+  <app-bottom-nav></app-bottom-nav>
 
 </div>
