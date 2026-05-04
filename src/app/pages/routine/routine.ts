@@ -130,15 +130,34 @@ export class Routine implements OnInit {
   getWeekDate(dayCode: string): string {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const targetIdx = days.indexOf(dayCode);
-    const now = new Date();
-    const todayIdx = now.getDay();
-    
-    // Simple logic: get the date for the target day within the current rolling week
-    const diff = targetIdx - todayIdx;
-    const target = new Date(now);
-    target.setDate(now.getDate() + diff);
-    
+    // Anchor on viewDate so day tabs pivot around the currently-viewed week
+    const anchor = new Date(this.viewDate + 'T00:00:00');
+    const anchorIdx = anchor.getDay();
+    const diff = targetIdx - anchorIdx;
+    const target = new Date(anchor);
+    target.setDate(anchor.getDate() + diff);
     return target.toISOString().split('T')[0];
+  }
+
+  onDatePicked(dateStr: string) {
+    if (!dateStr) return;
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const d = new Date(dateStr + 'T00:00:00');
+    this.viewDate = dateStr;
+    this.selectedDay = days[d.getDay()];
+    this.loadRoutines(this.viewDate);
+  }
+
+  goToToday() {
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const now = new Date();
+    this.viewDate = now.toISOString().split('T')[0];
+    this.selectedDay = days[now.getDay()];
+    this.loadRoutines(this.viewDate);
+  }
+
+  get isViewingToday(): boolean {
+    return this.viewDate === new Date().toISOString().split('T')[0];
   }
 
   updateDayView() {

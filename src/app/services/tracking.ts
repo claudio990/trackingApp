@@ -51,4 +51,26 @@ export class TrackingService {
   getMetrics(from: string, to: string) {
     return this.http.get<any>(`${this.apiUrl}/metrics?from=${from}&to=${to}`, this.auth.headers);
   }
+
+  // ── Pendientes ───────────────────────────────────────────────────────────
+  getPendientes(includeCompleted = false) {
+    const q = includeCompleted ? '?include_completed=1' : '';
+    return this.http.get<any[]>(`${this.apiUrl}/pendientes${q}`, this.auth.headers);
+  }
+
+  createPendiente(data: { title: string; description?: string; due_at: string }) {
+    return this.http.post<any>(`${this.apiUrl}/pendientes`, data, this.auth.headers);
+  }
+
+  updatePendiente(id: number, data: any) {
+    return this.http.patch<any>(`${this.apiUrl}/pendientes/${id}`, data, this.auth.headers);
+  }
+
+  togglePendiente(id: number) {
+    return this.http.post<any>(`${this.apiUrl}/pendientes/${id}/toggle`, {}, this.auth.headers);
+  }
+
+  deletePendiente(id: number) {
+    return this.http.delete(`${this.apiUrl}/pendientes/${id}`, this.auth.headers);
+  }
 }

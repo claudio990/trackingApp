@@ -57,8 +57,13 @@
         </button>
       </div>
 
-      <div class="date-indicator" style="text-align: center; font-size: 13px; color: var(--mex-turquesa); font-weight: 700; margin: 4px 0;">
-        📅 {{ viewDate }}
+      <div class="date-bar">
+        <input type="date"
+               class="glass-input date-pick"
+               [ngModel]="viewDate"
+               (ngModelChange)="onDatePicked($event)">
+        <button class="today-btn" *ngIf="!isViewingToday" (click)="goToToday()">Hoy</button>
+        <span class="date-indicator">📅 {{ viewDate }}</span>
       </div>
 
       <div class="shifts-board">

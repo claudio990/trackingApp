@@ -14,10 +14,12 @@ export class BottomNav {
   private auth = inject(AuthService);
   router = inject(Router);
 
-  get isRoutine()   { return this.router.url.startsWith('/routine'); }
-  get isDashboard() { return this.router.url.startsWith('/dashboard'); }
+  get isRoutine()    { return this.router.url.startsWith('/routine'); }
+  get isPendientes() { return this.router.url.startsWith('/pendientes'); }
+  get isDashboard()  { return this.router.url.startsWith('/dashboard'); }
 
-  goToRoutine()   { this.router.navigate(['/routine']); }
-  goToDashboard() { this.router.navigate(['/dashboard']); }
-  logout()        { this.auth.logout(); this.router.navigate(['/login']); }
+  goToRoutine()    { this.router.navigate(['/routine']); }
+  goToPendientes() { this.router.navigate(['/pendientes']); }
+  goToDashboard()  { this.router.navigate(['/dashboard']); }
+  logout()         { this.auth.logout(); this.router.navigate(['/login']); }
 }

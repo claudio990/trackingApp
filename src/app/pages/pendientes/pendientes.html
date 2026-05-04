@@ -1,0 +1,80 @@
+<div class="pend-wrapper">
+
+  <header class="top-nav glass-panel">
+    <div class="branding">⏰ Pendientes <small>Recordatorios</small></div>
+    <div class="top-nav-actions">
+      <button class="notif-btn" (click)="enableNotifications()" [title]="notifGranted ? 'Notificaciones activas' : 'Activar notificaciones'">
+        {{ notifGranted ? '🔔' : '🔕' }}
+      </button>
+      <button class="glass-button mex-btn-alt desktop-only" (click)="logout()">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <!-- Quick Add -->
+  <div class="quick-add glass-panel">
+    <input type="text"
+           class="glass-input"
+           placeholder="¿Qué tienes pendiente?"
+           [(ngModel)]="newTitle"
+           (keyup.enter)="add()">
+    <input type="datetime-local"
+           class="glass-input due-input"
+           [(ngModel)]="newDueAt">
+    <button class="glass-button mex-btn add-btn"
+            [disabled]="!newTitle.trim() || !newDueAt"
+            (click)="add()">+ Agregar</button>
+  </div>
+
+  <!-- Filter -->
+  <div class="filter-row">
+    <button class="filter-btn"
+            [class.active]="!showCompleted"
+            (click)="showCompleted && toggleCompletedFilter()">
+      Pendientes
+    </button>
+    <button class="filter-btn"
+            [class.active]="showCompleted"
+            (click)="!showCompleted && toggleCompletedFilter()">
+      Incluir completados
+    </button>
+  </div>
+
+  <!-- List -->
+  <div class="pendientes-list">
+    <div *ngIf="loading" class="empty-state">Cargando…</div>
+
+    <div *ngIf="!loading && pendientes.length === 0" class="empty-state">
+      <span class="big-icon">🌱</span>
+      <p>Sin pendientes. ¡Estás al corriente!</p>
+    </div>
+
+    <div class="pendiente-item glass-panel"
+         *ngFor="let p of pendientes; trackBy: trackById"
+         [class.completed]="p.completed_at"
+         [class.overdue]="isOverdue(p)"
+         [class.soon]="isSoon(p)">
+
+      <button class="check-btn" (click)="toggle(p)" [title]="p.completed_at ? 'Reabrir' : 'Marcar completado'">
+        <span *ngIf="p.completed_at">✓</span>
+      </button>
+
+      <div class="pendiente-body">
+        <div class="title-row">
+          <span class="title">{{ p.title }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-date">📅 {{ formatDate(p.due_at) }}</span>
+          <span class="meta-relative"
+                [class.text-danger]="isOverdue(p)"
+                [class.text-warn]="isSoon(p)">
+            {{ relativeTime(p.due_at) }}
+          </span>
+        </div>
+      </div>
+
+      <button class="delete-btn" (click)="remove(p)">✕</button>
+    </div>
+  </div>
+
+  <app-bottom-nav></app-bottom-nav>
+</div>
